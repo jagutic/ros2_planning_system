@@ -86,33 +86,42 @@ std::string nameActionsToString(const std::shared_ptr<plansys2_msgs::msg::Action
 std::string nameActionsToString(const std::shared_ptr<plansys2_msgs::msg::DurativeAction> action);
 
 std::string toString(
-  const plansys2_msgs::msg::Tree & tree, uint32_t node_id = 0, bool negate = false);
+  const plansys2_msgs::msg::Tree & tree, uint32_t node_id = 0, bool negate = false, int tab = 0);
 
 std::string toString(const plansys2_msgs::msg::Node & node);
 
-std::string toStringPredicate(const plansys2_msgs::msg::Tree & tree, uint32_t node_id, bool negate);
+std::string toStringPredicate(
+  const plansys2_msgs::msg::Tree & tree, uint32_t node_id, bool negate, int tab);
 
-std::string toStringFunction(const plansys2_msgs::msg::Tree & tree, uint32_t node_id, bool negate);
+std::string toStringFunction(
+  const plansys2_msgs::msg::Tree & tree, uint32_t node_id, bool negate, int tab);
 
-std::string toStringNumber(const plansys2_msgs::msg::Tree & tree, uint32_t node_id, bool negate);
+std::string toStringNumber(
+  const plansys2_msgs::msg::Tree & tree, uint32_t node_id, bool negate, int tab);
 
-std::string toStringAnd(const plansys2_msgs::msg::Tree & tree, uint32_t node_id, bool negate);
+std::string toStringAnd(
+  const plansys2_msgs::msg::Tree & tree, uint32_t node_id, bool negate, int tab);
 
-std::string toStringOr(const plansys2_msgs::msg::Tree & tree, uint32_t node_id, bool negate);
+std::string toStringOr(
+  const plansys2_msgs::msg::Tree & tree, uint32_t node_id, bool negate, int tab);
 
-std::string toStringNot(const plansys2_msgs::msg::Tree & tree, uint32_t node_id, bool negate);
+std::string toStringNot(
+  const plansys2_msgs::msg::Tree & tree, uint32_t node_id, bool negate, int tab);
 
 std::string toStringExpression(
-  const plansys2_msgs::msg::Tree & tree, uint32_t node_id, bool negate);
+  const plansys2_msgs::msg::Tree & tree, uint32_t node_id, bool negate, int tab);
 
 std::string toStringFunctionModifier(
-  const plansys2_msgs::msg::Tree & tree, uint32_t node_id, bool negate);
+  const plansys2_msgs::msg::Tree & tree, uint32_t node_id, bool negate, int tab);
 
-std::string toStringConstant(const plansys2_msgs::msg::Tree & tree, uint32_t node_id, bool negate);
+std::string toStringConstant(
+  const plansys2_msgs::msg::Tree & tree, uint32_t node_id, bool negate, int tab);
 
-std::string toStringParameter(const plansys2_msgs::msg::Tree & tree, uint32_t node_id, bool negate);
+std::string toStringParameter(
+  const plansys2_msgs::msg::Tree & tree, uint32_t node_id, bool negate, int tab);
 
-std::string toStringExists(const plansys2_msgs::msg::Tree & tree, uint32_t node_id, bool negate);
+std::string toStringExists(
+  const plansys2_msgs::msg::Tree & tree, uint32_t node_id, bool negate, int tab);
 
 /// This function creates a complete tree.
 /**

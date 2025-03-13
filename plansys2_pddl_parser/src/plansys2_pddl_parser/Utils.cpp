@@ -19,6 +19,8 @@
 #include <limits>
 #include <regex>
 
+#define TAB_SIZE 2
+
 namespace parser
 {
 namespace pddl
@@ -426,7 +428,7 @@ std::string nameActionsToString(const std::shared_ptr<plansys2_msgs::msg::Durati
   return ret;
 }
 
-std::string toString(const plansys2_msgs::msg::Tree & tree, uint32_t node_id, bool negate)
+std::string toString(const plansys2_msgs::msg::Tree & tree, uint32_t node_id, bool negate, int tab)
 {
   if (node_id >= tree.nodes.size()) {
     return {};
@@ -435,36 +437,36 @@ std::string toString(const plansys2_msgs::msg::Tree & tree, uint32_t node_id, bo
   std::string ret;
   switch (tree.nodes[node_id].node_type) {
     case plansys2_msgs::msg::Node::PREDICATE:
-      ret = toStringPredicate(tree, node_id, negate);
+      ret = toStringPredicate(tree, node_id, negate, tab);
       break;
     case plansys2_msgs::msg::Node::FUNCTION:
-      ret = toStringFunction(tree, node_id, negate);
+      ret = toStringFunction(tree, node_id, negate, tab);
       break;
     case plansys2_msgs::msg::Node::NUMBER:
-      ret = toStringNumber(tree, node_id, negate);
+      ret = toStringNumber(tree, node_id, negate, tab);
       break;
     case plansys2_msgs::msg::Node::AND:
-      ret = toStringAnd(tree, node_id, negate);
+      ret = toStringAnd(tree, node_id, negate, tab);
       break;
     case plansys2_msgs::msg::Node::OR:
-      ret = toStringOr(tree, node_id, negate);
+      ret = toStringOr(tree, node_id, negate, tab);
       break;
     case plansys2_msgs::msg::Node::NOT:
-      ret = toStringNot(tree, node_id, negate);
+      ret = toStringNot(tree, node_id, negate, tab);
       break;
     case plansys2_msgs::msg::Node::EXPRESSION:
-      ret = toStringExpression(tree, node_id, negate);
+      ret = toStringExpression(tree, node_id, negate, tab);
       break;
     case plansys2_msgs::msg::Node::FUNCTION_MODIFIER:
-      ret = toStringFunctionModifier(tree, node_id, negate);
+      ret = toStringFunctionModifier(tree, node_id, negate, tab);
       break;
     case plansys2_msgs::msg::Node::CONSTANT:
-      ret = toStringConstant(tree, node_id, negate);
+      ret = toStringConstant(tree, node_id, negate, tab);
       break;
     case plansys2_msgs::msg::Node::PARAMETER:
-      ret = toStringParameter(tree, node_id, negate);
+      ret = toStringParameter(tree, node_id, negate, tab);
     case plansys2_msgs::msg::Node::EXISTS:
-      ret = toStringExists(tree, node_id, negate);
+      ret = toStringExists(tree, node_id, negate, tab);
       break;
     default:
       std::cerr << "Unsupported node to string conversion" << std::endl;
@@ -490,7 +492,8 @@ std::string toString(const plansys2_msgs::msg::Node & node)
   return toString(tree);
 }
 
-std::string toStringPredicate(const plansys2_msgs::msg::Tree & tree, uint32_t node_id, bool negate)
+std::string toStringPredicate(
+  const plansys2_msgs::msg::Tree & tree, uint32_t node_id, bool negate, int tab)
 {
   if (node_id >= tree.nodes.size()) {
     return {};
@@ -517,7 +520,8 @@ std::string toStringPredicate(const plansys2_msgs::msg::Tree & tree, uint32_t no
   return ret;
 }
 
-std::string toStringFunction(const plansys2_msgs::msg::Tree & tree, uint32_t node_id, bool negate)
+std::string toStringFunction(
+  const plansys2_msgs::msg::Tree & tree, uint32_t node_id, bool negate, int tab)
 {
   if (node_id >= tree.nodes.size()) {
     return {};
@@ -535,7 +539,8 @@ std::string toStringFunction(const plansys2_msgs::msg::Tree & tree, uint32_t nod
   return ret;
 }
 
-std::string toStringNumber(const plansys2_msgs::msg::Tree & tree, uint32_t node_id, bool negate)
+std::string toStringNumber(
+  const plansys2_msgs::msg::Tree & tree, uint32_t node_id, bool negate, int tab)
 {
   if (node_id >= tree.nodes.size()) {
     return {};
@@ -544,7 +549,8 @@ std::string toStringNumber(const plansys2_msgs::msg::Tree & tree, uint32_t node_
   return std::to_string(tree.nodes[node_id].value);
 }
 
-std::string toStringAnd(const plansys2_msgs::msg::Tree & tree, uint32_t node_id, bool negate)
+std::string toStringAnd(
+  const plansys2_msgs::msg::Tree & tree, uint32_t node_id, bool negate, int tab)
 {
   if (node_id >= tree.nodes.size()) {
     return {};
@@ -562,15 +568,19 @@ std::string toStringAnd(const plansys2_msgs::msg::Tree & tree, uint32_t node_id,
     ret = "(or ";
   }
 
+  // Indent one level from where is it
+  tab += TAB_SIZE;
+
   for (auto child_id : tree.nodes[node_id].children) {
-    ret += "\n" + toString(tree, child_id, negate);
+    ret += "\n" + std::string(tab, ' ') + toString(tree, child_id, negate, tab);
   }
-  ret += "\n)";
+  ret += "\n" + std::string(tab - TAB_SIZE, ' ') + ")";
 
   return ret;
 }
 
-std::string toStringOr(const plansys2_msgs::msg::Tree & tree, uint32_t node_id, bool negate)
+std::string toStringOr(
+  const plansys2_msgs::msg::Tree & tree, uint32_t node_id, bool negate, int tab)
 {
   if (node_id >= tree.nodes.size()) {
     return {};
@@ -588,15 +598,19 @@ std::string toStringOr(const plansys2_msgs::msg::Tree & tree, uint32_t node_id, 
     ret = "(and ";
   }
 
+  // Indent one level from where is it
+  tab += TAB_SIZE;
+
   for (auto child_id : tree.nodes[node_id].children) {
-    ret += "\n" + toString(tree, child_id, negate);
+    ret += "\n" + std::string(tab, ' ') + toString(tree, child_id, negate, tab);
   }
-  ret += "\n)";
+  ret += "\n" + std::string(tab - TAB_SIZE, ' ') + ")";
 
   return ret;
 }
 
-std::string toStringNot(const plansys2_msgs::msg::Tree & tree, uint32_t node_id, bool negate)
+std::string toStringNot(
+  const plansys2_msgs::msg::Tree & tree, uint32_t node_id, bool negate, int tab)
 {
   if (node_id >= tree.nodes.size()) {
     return {};
@@ -608,7 +622,8 @@ std::string toStringNot(const plansys2_msgs::msg::Tree & tree, uint32_t node_id,
   return toString(tree, tree.nodes[node_id].children[0], !negate);
 }
 
-std::string toStringExpression(const plansys2_msgs::msg::Tree & tree, uint32_t node_id, bool negate)
+std::string toStringExpression(
+  const plansys2_msgs::msg::Tree & tree, uint32_t node_id, bool negate, int tab)
 {
   if (node_id >= tree.nodes.size()) {
     return {};
@@ -660,7 +675,7 @@ std::string toStringExpression(const plansys2_msgs::msg::Tree & tree, uint32_t n
   }
 
   for (auto child_id : tree.nodes[node_id].children) {
-    ret += " " + toString(tree, child_id, negate);
+    ret += " " + toString(tree, child_id, negate, tab);
   }
   ret += ")";
   if (negate) {
@@ -671,7 +686,7 @@ std::string toStringExpression(const plansys2_msgs::msg::Tree & tree, uint32_t n
 }
 
 std::string toStringFunctionModifier(
-  const plansys2_msgs::msg::Tree & tree, uint32_t node_id, bool negate)
+  const plansys2_msgs::msg::Tree & tree, uint32_t node_id, bool negate, int tab)
 {
   if (node_id >= tree.nodes.size()) {
     return {};
@@ -704,14 +719,15 @@ std::string toStringFunctionModifier(
   }
 
   for (auto child_id : tree.nodes[node_id].children) {
-    ret += toString(tree, child_id, negate);
+    ret += toString(tree, child_id, negate, tab);
   }
   ret += ")";
 
   return ret;
 }
 
-std::string toStringConstant(const plansys2_msgs::msg::Tree & tree, uint32_t node_id, bool negate)
+std::string toStringConstant(
+  const plansys2_msgs::msg::Tree & tree, uint32_t node_id, bool negate, int tab)
 {
   if (node_id >= tree.nodes.size()) {
     return {};
@@ -720,7 +736,8 @@ std::string toStringConstant(const plansys2_msgs::msg::Tree & tree, uint32_t nod
   return tree.nodes[node_id].name;
 }
 
-std::string toStringParameter(const plansys2_msgs::msg::Tree & tree, uint32_t node_id, bool negate)
+std::string toStringParameter(
+  const plansys2_msgs::msg::Tree & tree, uint32_t node_id, bool negate, int tab)
 {
   if (node_id >= tree.nodes.size()) {
     return {};
@@ -729,7 +746,8 @@ std::string toStringParameter(const plansys2_msgs::msg::Tree & tree, uint32_t no
   return tree.nodes[node_id].parameters[0].name;
 }
 
-std::string toStringExists(const plansys2_msgs::msg::Tree & tree, uint32_t node_id, bool negate)
+std::string toStringExists(
+  const plansys2_msgs::msg::Tree & tree, uint32_t node_id, bool negate, int tab)
 {
   if (node_id >= tree.nodes.size()) {
     return {};
@@ -749,7 +767,7 @@ std::string toStringExists(const plansys2_msgs::msg::Tree & tree, uint32_t node_
   ret += ") ";
 
   for (auto child_id : tree.nodes[node_id].children) {
-    ret += toString(tree, child_id, negate);
+    ret += toString(tree, child_id, negate, tab);
   }
   ret += ")";
 
